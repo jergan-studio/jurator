@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Jurator — Dashboard & Editor</title>
+  <meta name="description" content="Jurator — lightweight website editor with live preview, save, share and export." />
+  <style>
+    :root{--bg:#0b1220;--panel:#071029;--muted:#9fb6c9;--accent:#06b6d4;--card:#0f1724}
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,#041321 0%, #071029 100%);color:#e6eef8;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Arial}
+    .wrap{max-width:1100px;margin:18px auto;padding:16px}
+    header{display:flex;justify-content:space-between;align-items:center}
+    h1{margin:0;font-size:18px}
+    .muted{color:var(--muted);font-size:13px}
+    .row{display:flex;gap:8px;align-items:center}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:12px;border-radius:12px;box-shadow:0 6px 20px rgba(2,6,23,0.6)}
+    .tabs{display:flex;gap:6px;margin-top:12px}
+    .tab{padding:8px 10px;border-radius:10px;background:transparent;border:1px solid transparent;cursor:pointer}
+    .tab.active{background:var(--accent);color:#021026;font-weight:700}
+    .layout{display:grid;grid-template-columns:360px 1fr;gap:12px;margin-top:12px}
+    .editor-area{display:flex;flex-direction:column;height:72vh}
+    textarea{width:100%;height:100%;resize:none;background:transparent;border:1px solid rgba(255,255,255,0.04);color:inherit;padding:10px;border-radius:8px;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono',monospace}
+    .preview{height:72vh;border-radius:8px;border:1px solid rgba(255,255,255,0.03);overflow:hidden}
+    iframe{width:100%;height:100%;border:0;background:white}
+    button{background:var(--accent);border:none;padding:8px 10px;border-radius:8px;color:#021026;font-weight:700;cursor:pointer}
+    .small{padding:6px 8px;font-size:13px}
+    .list{margin-top:10px;display:flex;flex-direction:column;gap:8px;max-height:44vh;overflow:auto}
+    .proj{display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02)}
+    .proj .meta{display:flex;flex-direction:column}
+    .proj .meta strong{font-size:14px}
+    .controls{display:flex;gap:6px}
+    .link{color:var(--accent);text-decoration:underline;font-size:13px}
+    footer{margin-top:12px;color:var(--muted);font-size:13px}
+    @media(max-width:980px){.layout{grid-template-columns:1fr;}.editor-area{height:50vh}.preview{height:50vh}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Jurator</h1>
+        <div class="muted">Create, preview, save, share and export small websites</div>
+      </div>
+      <div class="row">
+        <div class="muted">Made for GitHub Pages</div>
+      </div>
+    </header>
+
+    <div class="tabs">
+      <button class="tab active" id="tab-dashboard">Dashboard</button>
+      <button class="tab" id="tab-editor">Editor</button>
+    </div>
+
+    <div class="layout">
+      <aside class="card" style="padding:12px">
+        <div id="dashboard-panel">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <strong>Your projects</strong>
+            <button id="newBtn" class="small">+ New</button>
+          </div>
+
+          <div class="list" id="projectsList"></div>
+
+          <div style="margin-top:12px">
+            <strong>Import / Open URL</strong>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <input id="openUrl" placeholder="Paste share URL or base64 data" style="flex:1;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:inherit" />
+              <button id="openUrlBtn" class="small">Open</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="editor-panel" style="display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <strong>Editor</strong>
+            <div class="controls">
+              <button id="saveBtn" class="small">Save</button>
+              <button id="downloadBtn" class="small">Download</button>
+              <button id="shareBtn" class="small">Share</button>
+            </div>
+          </div>
+
+          <div style="margin-top:10px;color:var(--muted);font-size:13px">Project: <span id="currentName">(untitled)</span></div>
+
+          <div style="margin-top:10px">
+            <label class="muted">Title</label>
+            <input id="projTitle" placeholder="My project" style="width:100%;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:inherit;margin-top:6px" />
+          </div>
+
+        </div>
+
+      </aside>
+
+      <main style="display:flex;flex-direction:column;gap:12px">
+        <div class="editor-area card" id="editorArea">
+          <div style="display:flex;gap:8px;align-items:center">
+            <div class="muted">HTML</div>
+            <div style="flex:1"></div>
+            <button id="runBtn" class="small">Run</button>
+            <button id="previewOpen" class="small">Open Preview</button>
+          </div>
+          <textarea id="htmlEditor"><!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Untitled — Jurator</title>
+  <style>body{font-family:system-ui;padding:24px;background:#fff;color:#111}h1{color:#036}</style>
+</head>
+<body>
+  <h1>Hello from Jurator</h1>
+  <p>Edit this HTML and press Run to preview.</p>
+</body>
+</html></textarea>
+        </div>
+
+        <div class="preview card">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px">
+            <strong>Live preview</strong>
+            <div class="muted">Use Run or press Ctrl+Enter</div>
+          </div>
+          <div style="height:calc(72vh - 84px);overflow:hidden">
+            <iframe id="previewFrame" sandbox="allow-scripts allow-forms"></iframe>
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+    <footer class="muted">Tips: Use the Share button to create a copyable URL that encodes your HTML. Saved projects are stored in localStorage. You can download a single-file HTML with the Download button.</footer>
+  </div>
+
+  <script>
+    // Simple project storage for Jurator
+    const storageKey = 'jurator_projects_v1';
+    const htmlEditor = document.getElementById('htmlEditor');
+    const previewFrame = document.getElementById('previewFrame');
+    const projectsList = document.getElementById('projectsList');
+    const newBtn = document.getElementById('newBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const runBtn = document.getElementById('runBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const shareBtn = document.getElementById('shareBtn');
+    const projTitle = document.getElementById('projTitle');
+    const currentName = document.getElementById('currentName');
+    const tabDashboard = document.getElementById('tab-dashboard');
+    const tabEditor = document.getElementById('tab-editor');
+    const dashboardPanel = document.getElementById('dashboard-panel');
+    const editorPanel = document.getElementById('editor-panel');
+    const previewOpen = document.getElementById('previewOpen');
+    const openUrl = document.getElementById('openUrl');
+    const openUrlBtn = document.getElementById('openUrlBtn');
+
+    let projects = loadProjects();
+    let currentId = null;
+
+    // --- utilities ---
+    function saveProjects(){ localStorage.setItem(storageKey, JSON.stringify(projects)); }
+    function loadProjects(){ try{ return JSON.parse(localStorage.getItem(storageKey) || '{}') }catch(e){ return {} } }
+    function uid(){ return 'p_' + Math.random().toString(36).slice(2,10) }
+
+    // base64 helpers for share URL
+    function encodeContent(str){ try{ return btoa(unescape(encodeURIComponent(str))) }catch(e){ return btoa(str) } }
+    function decodeContent(b64){ try{ return decodeURIComponent(escape(atob(b64))) }catch(e){ try{ return atob(b64) }catch(e){ return '' } } }
+
+    // render project list
+    function renderList(){ projectsList.innerHTML = ''; const keys = Object.keys(projects).sort((a,b)=> projects[b].updated - projects[a].updated);
+      if(keys.length === 0){ projectsList.innerHTML = '<div class="muted">No projects yet — click New to create one.</div>'; return; }
+      keys.forEach(id => {
+        const p = projects[id];
+        const el = document.createElement('div'); el.className = 'proj';
+        el.innerHTML = `<div class="meta"><strong>${escapeHtml(p.name)}</strong><div class="muted">Updated ${new Date(p.updated).toLocaleString()}</div></div>`;
+        const ctr = document.createElement('div'); ctr.className='controls';
+        const open = document.createElement('button'); open.className='small'; open.textContent='Open'; open.addEventListener('click', ()=> openProject(id));
+        const share = document.createElement('button'); share.className='small'; share.textContent='Share'; share.addEventListener('click', ()=> { copy(shareUrlForProject(p)); alert('Share URL copied to clipboard'); });
+        const del = document.createElement('button'); del.className='small'; del.textContent='Delete'; del.addEventListener('click', ()=>{ if(confirm('Delete project?')){ delete projects[id]; saveProjects(); renderList(); }});
+        ctr.append(open, share, del); el.appendChild(ctr); projectsList.appendChild(el);
+      })
+    }
+
+    function escapeHtml(s){ return s.replaceAll('<','&lt;').replaceAll('>','&gt;') }
+
+    function openProject(id){ const p = projects[id]; if(!p) return; currentId = id; projTitle.value = p.name; currentName.textContent = p.name; htmlEditor.value = p.html; tabEditor.click(); }
+
+    function newProject(){ const id = uid(); const name = 'Untitled ' + new Date().toLocaleString(); projects[id] = {name, html:htmlEditor.value, created:Date.now(), updated:Date.now()}; saveProjects(); renderList(); openProject(id); }
+
+    function saveCurrent(){ if(!currentId){ // create new
+        const id = uid(); projects[id] = {name: projTitle.value || 'Untitled', html: htmlEditor.value, created: Date.now(), updated: Date.now()}; currentId = id;
+      } else { projects[currentId].name = projTitle.value || projects[currentId].name; projects[currentId].html = htmlEditor.value; projects[currentId].updated = Date.now(); }
+      saveProjects(); renderList(); currentName.textContent = projects[currentId].name; alert('Saved');
+    }
+
+    function runPreview(){ const doc = htmlEditor.value; const blob = new Blob([doc], {type:'text/html'}); const url = URL.createObjectURL(blob); previewFrame.src = url; setTimeout(()=> URL.revokeObjectURL(url), 10000); }
+
+    function downloadHtml(){ const name = (projTitle.value || 'jurator-project') + '.html'; const a = document.createElement('a'); const blob = new Blob([htmlEditor.value], {type:'text/html'}); a.href = URL.createObjectURL(blob); a.download = name; a.click(); setTimeout(()=> URL.revokeObjectURL(a.href), 2000); }
+
+    function shareUrlForProject(p){ // encode full content in URL as base64 (note: long content -> long URL)
+      const base = location.origin + location.pathname;
+      const data = encodeContent(p.html);
+      return `${base}?data=${data}&title=${encodeURIComponent(p.name)}`;
+    }
+
+    function copy(text){ navigator.clipboard?.writeText(text).catch(()=>{ const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }); }
+
+    function loadFromUrlParams(){ const qp = new URLSearchParams(location.search); const data = qp.get('data'); const title = qp.get('title'); const project = qp.get('project'); if(data){ // load shared content
+      const html = decodeContent(data);
+      htmlEditor.value = html; projTitle.value = title || 'Imported'; tabEditor.click(); alert('Imported HTML from URL');
+    } else if(project){ // try to load by local project id
+      const p = projects[project]; if(p){ openProject(project); } }
+    }
+
+    // open pasted url/data
+    openUrlBtn.addEventListener('click', ()=>{
+      const v = openUrl.value.trim(); if(!v) return; try{
+        const u = new URL(v, location.href);
+        const qp = new URLSearchParams(u.search);
+        if(qp.get('data')){ const html = decodeContent(qp.get('data')); htmlEditor.value = html; projTitle.value = qp.get('title') || 'Imported'; tabEditor.click(); return; }
+      }catch(e){}
+      // fallback: assume raw base64
+      try{ const html = decodeContent(v); htmlEditor.value = html; projTitle.value = 'Imported'; tabEditor.click(); }catch(e){ alert('Could not parse the input'); }
+    });
+
+    // tabs
+    tabDashboard.addEventListener('click', ()=>{ tabDashboard.classList.add('active'); tabEditor.classList.remove('active'); dashboardPanel.style.display='block'; editorPanel.style.display='none'; });
+    tabEditor.addEventListener('click', ()=>{ tabEditor.classList.add('active'); tabDashboard.classList.remove('active'); dashboardPanel.style.display='none'; editorPanel.style.display='block'; });
+
+    // buttons
+    newBtn.addEventListener('click', newProject);
+    saveBtn.addEventListener('click', ()=>{ projects = loadProjects(); saveCurrent(); });
+    runBtn.addEventListener('click', runPreview);
+    downloadBtn.addEventListener('click', downloadHtml);
+    shareBtn.addEventListener('click', ()=>{ // create temporary object to encode
+      const p = {name: projTitle.value || 'Untitled', html: htmlEditor.value}; const data = encodeContent(p.html); const url = location.origin + location.pathname + '?data=' + data + '&title=' + encodeURIComponent(p.name); copy(url); alert('Share URL copied to clipboard'); });
+
+    // keyboard shortcut: Ctrl/Cmd + Enter to run
+    document.addEventListener('keydown', (e)=>{ if((e.ctrlKey||e.metaKey) && e.key === 'Enter'){ e.preventDefault(); runPreview(); } });
+
+    // preview open in new window
+    previewOpen.addEventListener('click', ()=>{ const w = window.open(); w.document.open(); w.document.write(htmlEditor.value); w.document.close(); });
+
+    // load on start
+    renderList(); loadFromUrlParams();
+
+    // if user has 'project' query param referencing local project id, open it
+    (function openByLocalId(){ const qp = new URLSearchParams(location.search); const pid = qp.get('project'); if(pid && projects[pid]) openProject(pid); })();
+
+  </script>
+</body>
+</html>
